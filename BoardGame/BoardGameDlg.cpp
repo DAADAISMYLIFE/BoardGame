@@ -329,42 +329,7 @@ void CBoardGameDlg::ClickedItem2(){
 void CBoardGameDlg::OnBnClickedRollDice(){
 	UpdateData(TRUE);
 	SetTimer(DICE_TIMER, 50, 0);
-
-	//diceNum = rand() % 6 + 1;	//주사위 숫자
-	//if (useItem1 && numItem1>0) { //홀수 아이템 사용
-	//	numItem1--;
-	//	if (numItem1 <= 0) {
-	//		useItem1 = FALSE;
-	//	}
-	//	while (diceNum % 2 == 0){
-	//		diceNum = rand() % 6 + 1;
-	//	}
-	//}
-	//else if (useItem2 && numItem2 > 0) { //짝수 아이템 사용
-	//	numItem2--;
-	//	if (numItem2 <= 0) {
-	//		useItem2 = FALSE;
-	//	}
-	//	while (diceNum % 2 != 0) {
-	//		diceNum = rand() % 6 + 1;
-	//	}
-	//}//-------------------여기까지 오면 주사위 숫자 구해짐
-	////특수칸 이벤트 처리
-
-	//if (myPlayer->getI() + diceNum > BOARDSIZE-1) {
-	//	myPlayer->SetI(BOARDSIZE-1);
-	//}
-	//else {
-	//	//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
-	//	myPlayer->SetI(myPlayer->getI() + diceNum);
-	//	//send(diceNum);
-	//}
-
-	UpdateData(FALSE);
-	Invalidate();
 }
-
-
 //상대의 주사위 넘버를 받으면 그 만큼 이동
 //diceNum = receive();
 //myPlayer->SetI(myPlayer->getI() + diceNum);
@@ -388,7 +353,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				if (numItem1 <= 0) {
 					useItem1 = FALSE;
 				}
-				while (diceNum % 2 == 0) {
+				while (diceNum % 2 == 0){
 					diceNum = rand() % 6 + 1;
 				}
 			}
@@ -411,9 +376,8 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				myPlayer->SetI(myPlayer->getI() + diceNum);
 				//send(diceNum);
 			}
-
-
-
+			UpdateData(FALSE);
+			Invalidate();
 			return;
 		}
 	}
