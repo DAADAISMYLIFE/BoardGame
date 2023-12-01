@@ -145,9 +145,13 @@ BOOL CBoardGameDlg::OnInitDialog()
 	//특수칸 만들기
 	board[BOARDSIZE - 2].setBlockType(2);
 	board[7].setBlockType(1);
+	board[18].setBlockType(1);
 	board[27].setBlockType(1);
-	board[15].setBlockType(1);
-	board[40].setBlockType(1);
+	board[34].setBlockType(1);
+	board[51].setBlockType(1);
+	board[58].setBlockType(1);
+	board[60].setBlockType(1);
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
