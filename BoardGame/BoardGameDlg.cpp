@@ -432,7 +432,13 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				}
 			}//-------------------여기까지 오면 주사위 숫자 구해짐
 			int moveBlocks = myPlayer->getI() + diceNum;
-			if (moveBlocks > BOARDSIZE - 1) {
+			CString sendMoveBlocks;
+			sendMoveBlocks.Format(_T("%d"), moveBlocks);
+			myPlayer->SetI(moveBlocks);
+			//상대방에게 나의 위치를 보낸다.
+			YourSoket.Send((LPCTSTR)sendMoveBlocks, (sendMoveBlocks.GetLength() + 1) * sizeof(TCHAR));
+
+			if (moveBlocks >= BOARDSIZE - 1) {
 				moveBlocks = BOARDSIZE - 1;
 				MessageBox(_T("내가 이김"));
 			}
@@ -451,8 +457,6 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 					moveBlocks = 0;
 				}
 			}
-			//int* sendLocation = &moveBlocks;
-			CString sendMoveBlocks;
 			sendMoveBlocks.Format(_T("%d"), moveBlocks);
 			myPlayer->SetI(moveBlocks);
 			//상대방에게 나의 위치를 보낸다.
