@@ -115,6 +115,8 @@ BOOL CBoardGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	//GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE); //잠시 풀어둠
+	GetDlgItem(IDC_START_GAME)-> EnableWindow(FALSE);
 	srand((unsigned)time(NULL));
 	int ver = 1;
 	int hor = 1;
@@ -132,6 +134,11 @@ BOOL CBoardGameDlg::OnInitDialog()
 			ver += v;
 		}
 	}
+	//특수칸 만들기
+	board[7].setBlockType(1);
+	board[27].setBlockType(1);
+	board[15].setBlockType(1);
+	board[40].setBlockType(1);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -217,7 +224,7 @@ void CBoardGameDlg::OnPaint()
 			diceBitMap.LoadBitmap(diceNum);
 			CBitmap* oldbitmap = MemDC.SelectObject(&diceBitMap);
 			//출력 좌표x, y, 폭, 넓이, 넣을 BITMAP DC, 저장한 것이 어디서 시작하는지 좌표
-			dc.BitBlt(700, 420, 100, 100, &MemDC, 0, 0, SRCCOPY);
+			dc.BitBlt(700, 370, 100, 100, &MemDC, 0, 0, SRCCOPY);
 			dc.SelectObject(oldbitmap);
 			diceBitMap.DeleteObject();
 		}
@@ -231,19 +238,16 @@ HCURSOR CBoardGameDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
 //방 만들기 버튼
-void CBoardGameDlg::OnBnClickedCreatRoom()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+void CBoardGameDlg::OnBnClickedCreatRoom(){
 	UpdateData(TRUE);
+	userType = TRUE;
 }
 
 //방 접속 버튼
-void CBoardGameDlg::OnBnClickedEnterRoom()
-{
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+void CBoardGameDlg::OnBnClickedEnterRoom(){
 	UpdateData(TRUE);
+	userType = FALSE;
 }
 
 //게임 종료 버튼
@@ -320,7 +324,9 @@ void CBoardGameDlg::OnBnClickedRollDice(){
 		while (diceNum % 2 != 0) {
 			diceNum = rand() % 6 + 1;
 		}
-	}
+	}//-------------------여기까지 오면 주사위 숫자 구해짐
+	//특수칸 이벤트 처리
+
 	UpdateData(FALSE);
 	Invalidate();
 }

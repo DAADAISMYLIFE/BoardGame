@@ -36,15 +36,16 @@ protected:
 public:
 	CString userName;
 	CString serverAddress;
+	BOOL userType;
 	afx_msg void OnBnClickedCreatRoom();
 	afx_msg void OnBnClickedEnterRoom();
 	afx_msg void OnBnClickedExitGame();
-	BOOL useItem1;
-	BOOL useItem2;
-	int numItem1 = 2;
-	int numItem2 = 2;
-	int diceNum = 0;
-	Blocks *board = new Blocks[BOARDSIZE];
+	BOOL useItem1;	  //홀수 아이템 사용 여부
+	BOOL useItem2;	  //짝수 아이템 사용 여부
+	int numItem1 = 2; //홀수 아이템 개수
+	int numItem2 = 2; //짝수 아이템 개수
+	int diceNum = 0;  //주사위 나온 숫자
+	Blocks *board = new Blocks[BOARDSIZE]; //게임판 생성
 	//소켓 함수
 	void OnAccept();
 	void OnConnect();
