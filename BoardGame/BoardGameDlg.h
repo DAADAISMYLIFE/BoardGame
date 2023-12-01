@@ -6,7 +6,7 @@
 #include "Blocks.h"
 #include "Player.h"
 #include "CMySocket.h"
-#define BOARDSIZE 47
+#define BOARDSIZE 71
 
 
 // CBoardGameDlg 대화 상자
