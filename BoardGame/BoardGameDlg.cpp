@@ -353,9 +353,7 @@ void CBoardGameDlg::OnReceive(){
 		int receivedMoveBlocks = _tstoi((const wchar_t*)pBuf);
 		
 		yourPlayer->SetI(receivedMoveBlocks);
-		if (isConfirm)
-			GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
-		isConfirm = FALSE;
+		GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
 		Invalidate(TRUE);
 	}
 	delete[] pBuf;
@@ -466,7 +464,6 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 			sendMoveBlocks.Format(_T("%d"), moveBlocks);
 			myPlayer->SetI(moveBlocks);
 			//상대방에게 나의 위치를 보낸다.
-			isConfirm = TRUE;
 			YourSoket.Send((LPCTSTR)sendMoveBlocks, (sendMoveBlocks.GetLength() + 1) * sizeof(TCHAR));
 			UpdateData(FALSE);
 			Invalidate();
