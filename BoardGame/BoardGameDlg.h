@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Blocks.h"
+#include "Player.h"
 #define BOARDSIZE 47
 
 
@@ -55,4 +56,8 @@ public:
 	afx_msg void ClickedItem1();
 	afx_msg void ClickedItem2();
 	afx_msg void OnBnClickedRollDice();
+	Player *myPlayer;
+	Player *yourPlayer;
+	int animationFrame = 0;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

@@ -80,6 +80,7 @@ BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_ITEM1, &CBoardGameDlg::ClickedItem1)
 	ON_BN_CLICKED(IDC_ITEM2, &CBoardGameDlg::ClickedItem2)
 	ON_BN_CLICKED(IDB_ROLL_DICE, &CBoardGameDlg::OnBnClickedRollDice)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -115,6 +116,9 @@ BOOL CBoardGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	//플레이어 생성
+	myPlayer = new Player;
+	yourPlayer = new Player;
 	//GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE); //잠시 풀어둠
 	GetDlgItem(IDC_START_GAME)-> EnableWindow(FALSE);
 	srand((unsigned)time(NULL));
@@ -184,7 +188,8 @@ void CBoardGameDlg::OnPaint()
 		CDialogEx::OnPaint();
 		CClientDC dc(this);
 
-		CBrush brush, * oldBrush;
+		CBrush brush;
+		CBrush* oldBrush;
 
 		int r = 10;
 		int pedding = 25;
@@ -192,30 +197,47 @@ void CBoardGameDlg::OnPaint()
 			int xPos = board[i].getX();
 			int yPos = board[i].getY();
 			if (i == 0) {
+				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(255, 0, 0));
-				oldBrush = dc.SelectObject(&brush);
 			}
 			else if (i == BOARDSIZE - 1) {
+				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(0, 255, 0));
-				oldBrush = dc.SelectObject(&brush);
 			}
 			else if (i == BOARDSIZE - 2) {
+				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(200, 0, 0));
-				oldBrush = dc.SelectObject(&brush);
 			}
 			else if (board[i].getBlockType() == 1) {
+				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(255, 255, 0));
-				oldBrush = dc.SelectObject(&brush);
 			}
 			else {
+				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(204, 201, 231));
+			}
+			oldBrush = dc.SelectObject(&brush);
+			dc.Rectangle(xPos + pedding, yPos + pedding, xPos - pedding, yPos - pedding);
+
+			if (i == yourPlayer->getI()) {
+				brush.DeleteObject();
+				brush.CreateSolidBrush(RGB(200, 255, 255));
 				oldBrush = dc.SelectObject(&brush);
+				dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
 			}
 
-			dc.Rectangle(xPos + pedding, yPos + pedding, xPos - pedding, yPos - pedding);
+			if (i == myPlayer->getI()) {
+				brush.DeleteObject();
+				brush.CreateSolidBrush(RGB(255, 200, 255));
+				oldBrush = dc.SelectObject(&brush);
+				dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+			}
+
+			dc.SelectObject(oldBrush);
 		}
-		dc.SelectObject(oldBrush);
 		brush.DeleteObject();
+		 
+		// //////////
 		//주사위 그림
 		CDC MemDC;
 		MemDC.CreateCompatibleDC(&dc);
@@ -224,7 +246,7 @@ void CBoardGameDlg::OnPaint()
 			diceBitMap.LoadBitmap(diceNum);
 			CBitmap* oldbitmap = MemDC.SelectObject(&diceBitMap);
 			//출력 좌표x, y, 폭, 넓이, 넣을 BITMAP DC, 저장한 것이 어디서 시작하는지 좌표
-			dc.BitBlt(700, 370, 100, 100, &MemDC, 0, 0, SRCCOPY);
+			dc.BitBlt(700, 350, 100, 100, &MemDC, 0, 0, SRCCOPY);
 			dc.SelectObject(oldbitmap);
 			diceBitMap.DeleteObject();
 		}
@@ -306,27 +328,94 @@ void CBoardGameDlg::ClickedItem2(){
 //주사위 굴리는 함수
 void CBoardGameDlg::OnBnClickedRollDice(){
 	UpdateData(TRUE);
-	diceNum = rand() % 6 + 1;	//주사위 숫자
-	if (useItem1 && numItem1>0) { //홀수 아이템 사용
-		numItem1--;
-		if (numItem1 <= 0) {
-			useItem1 = FALSE;
-		}
-		while (diceNum % 2 == 0){
-			diceNum = rand() % 6 + 1;
-		}
-	}
-	else if (useItem2 && numItem2 > 0) { //짝수 아이템 사용
-		numItem2--;
-		if (numItem2 <= 0) {
-			useItem2 = FALSE;
-		}
-		while (diceNum % 2 != 0) {
-			diceNum = rand() % 6 + 1;
-		}
-	}//-------------------여기까지 오면 주사위 숫자 구해짐
-	//특수칸 이벤트 처리
+	SetTimer(DICE_TIMER, 50, 0);
+
+	//diceNum = rand() % 6 + 1;	//주사위 숫자
+	//if (useItem1 && numItem1>0) { //홀수 아이템 사용
+	//	numItem1--;
+	//	if (numItem1 <= 0) {
+	//		useItem1 = FALSE;
+	//	}
+	//	while (diceNum % 2 == 0){
+	//		diceNum = rand() % 6 + 1;
+	//	}
+	//}
+	//else if (useItem2 && numItem2 > 0) { //짝수 아이템 사용
+	//	numItem2--;
+	//	if (numItem2 <= 0) {
+	//		useItem2 = FALSE;
+	//	}
+	//	while (diceNum % 2 != 0) {
+	//		diceNum = rand() % 6 + 1;
+	//	}
+	//}//-------------------여기까지 오면 주사위 숫자 구해짐
+	////특수칸 이벤트 처리
+
+	//if (myPlayer->getI() + diceNum > BOARDSIZE-1) {
+	//	myPlayer->SetI(BOARDSIZE-1);
+	//}
+	//else {
+	//	//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
+	//	myPlayer->SetI(myPlayer->getI() + diceNum);
+	//	//send(diceNum);
+	//}
 
 	UpdateData(FALSE);
 	Invalidate();
+}
+
+
+//상대의 주사위 넘버를 받으면 그 만큼 이동
+//diceNum = receive();
+//myPlayer->SetI(myPlayer->getI() + diceNum);
+
+
+void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == DICE_TIMER) {
+		diceNum = (rand() % 6) + 1;
+		Invalidate();
+		animationFrame++;
+
+		if (animationFrame >= 20) {
+			KillTimer(DICE_TIMER);
+			animationFrame = 0;
+
+			diceNum = rand() % 6 + 1;	//주사위 숫자
+			if (useItem1 && numItem1 > 0) { //홀수 아이템 사용
+				numItem1--;
+				if (numItem1 <= 0) {
+					useItem1 = FALSE;
+				}
+				while (diceNum % 2 == 0) {
+					diceNum = rand() % 6 + 1;
+				}
+			}
+			else if (useItem2 && numItem2 > 0) { //짝수 아이템 사용
+				numItem2--;
+				if (numItem2 <= 0) {
+					useItem2 = FALSE;
+				}
+				while (diceNum % 2 != 0) {
+					diceNum = rand() % 6 + 1;
+				}
+			}//-------------------여기까지 오면 주사위 숫자 구해짐
+			//특수칸 이벤트 처리
+
+			if (myPlayer->getI() + diceNum > BOARDSIZE - 1) {
+				myPlayer->SetI(BOARDSIZE - 1);
+			}
+			else {
+				//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
+				myPlayer->SetI(myPlayer->getI() + diceNum);
+				//send(diceNum);
+			}
+
+
+
+			return;
+		}
+	}
+	CDialogEx::OnTimer(nIDEvent);
 }

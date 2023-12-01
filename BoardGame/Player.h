@@ -8,11 +8,9 @@ class Player
 public:
 	Player(); 
 
-	void Player::setCord(int x, int y);
-	void Player::SetI(int i);
-	int Player::getX();
-	int Player::getY();
-	int Player::getI();
+	void setCord(int x, int y);
+	void SetI(int i);
+	int getI();
 	BOOL Player_Turn = FALSE;
 };
 

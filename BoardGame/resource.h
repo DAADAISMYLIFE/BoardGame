@@ -6,6 +6,7 @@
 #define IDD_ABOUTBOX                    100
 #define IDS_ABOUTBOX                    101
 #define IDD_BOARDGAME_DIALOG            102
+#define DICE_TIMER                      102
 #define IDP_SOCKETS_INIT_FAILED         103
 #define IDR_MAINFRAME                   128
 #define IDB_BITMAP1                     130
