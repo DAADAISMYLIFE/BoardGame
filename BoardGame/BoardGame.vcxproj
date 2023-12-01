@@ -208,6 +208,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\BoardGame.ico" />
+    <Image Include="res\dice1.bmp" />
+    <Image Include="res\dice2.bmp" />
+    <Image Include="res\dice3.bmp" />
+    <Image Include="res\dice4.bmp" />
+    <Image Include="res\dice5.bmp" />
+    <Image Include="res\dice6.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

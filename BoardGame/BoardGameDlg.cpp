@@ -52,6 +52,8 @@ END_MESSAGE_MAP()
 
 CBoardGameDlg::CBoardGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_BOARDGAME_DIALOG, pParent)
+	, userName(_T("Guest"))
+	, serverAddress(_T("localhost"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -59,6 +61,8 @@ CBoardGameDlg::CBoardGameDlg(CWnd* pParent /*=nullptr*/)
 void CBoardGameDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_SET_NAME, userName);
+	DDX_Text(pDX, IDC_SET_SERVER_ADDR, serverAddress);
 }
 
 BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
