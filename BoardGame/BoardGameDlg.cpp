@@ -139,7 +139,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 		}
 	}
 	//특수칸 만들기
-	board[0].setBlockType(2);
+	board[BOARDSIZE - 2].setBlockType(2);
 	board[7].setBlockType(1);
 	board[27].setBlockType(1);
 	board[15].setBlockType(1);
@@ -344,7 +344,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 		Invalidate();
 		animationFrame++;
 
-		if (animationFrame >= 1) {
+		if (animationFrame >= 20) {
 			KillTimer(DICE_TIMER);
 			animationFrame = 0;
 
@@ -370,12 +370,12 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 			int moveBlocks = myPlayer->getI() + diceNum;
 			if (moveBlocks > BOARDSIZE - 1) {
 				moveBlocks = BOARDSIZE - 1;
-				moveBlocks = 0; //삭제
+				MessageBox(_T("내가 이김"));
 			}
 			else {
 				//특수칸 이벤트 처리
 				//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
-				myPlayer->SetI(myPlayer->getI() + diceNum);
+				myPlayer->SetI(moveBlocks);
 				if (board[moveBlocks].getBlockType() == 1) {
 					MessageBox(_T("으엑"));
 					do {
