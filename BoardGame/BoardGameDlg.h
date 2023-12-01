@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include "Blocks.h"
+#define BOARDSIZE 47
 
 
 // CBoardGameDlg 대화 상자
@@ -39,4 +41,5 @@ public:
 	afx_msg void OnBnClickedExitGame();
 	BOOL useItem1;
 	BOOL useItem2;
+	Blocks *board = new Blocks[BOARDSIZE];
 };

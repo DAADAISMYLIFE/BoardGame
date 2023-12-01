@@ -112,6 +112,22 @@ BOOL CBoardGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	int ver = 1;
+	int hor = 1;
+	int v = 1;
+	for (int i = 0; i < BOARDSIZE; i++) {
+		if (ver > 11 || ver <= 0) {
+			v *= -1;
+			ver += v;
+			hor++;
+			board[i].setCord(50 * (ver), 50 * hor);
+			hor++;
+		}
+		else {
+			board[i].setCord(50 * (ver), 50 * hor);
+			ver += v;
+		}
+	}
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -155,6 +171,40 @@ void CBoardGameDlg::OnPaint()
 	else
 	{
 		CDialogEx::OnPaint();
+		CClientDC dc(this);
+
+		CBrush brush, * oldBrush;
+
+		int r = 10;
+		int pedding = 25;
+		for (int i = 0; i < BOARDSIZE; i++) {
+			int xPos = board[i].getX();
+			int yPos = board[i].getY();
+			if (i == 0) {
+				brush.CreateSolidBrush(RGB(255, 0, 0));
+				oldBrush = dc.SelectObject(&brush);
+			}
+			else if (i == BOARDSIZE - 1) {
+				brush.CreateSolidBrush(RGB(0, 255, 0));
+				oldBrush = dc.SelectObject(&brush);
+			}
+			else if (i == BOARDSIZE - 2) {
+				brush.CreateSolidBrush(RGB(200, 0, 0));
+				oldBrush = dc.SelectObject(&brush);
+			}
+			else if (board[i].getBlockType() == 1) {
+				brush.CreateSolidBrush(RGB(255, 255, 0));
+				oldBrush = dc.SelectObject(&brush);
+			}
+			else {
+				brush.CreateSolidBrush(RGB(204, 201, 231));
+				oldBrush = dc.SelectObject(&brush);
+			}
+
+			dc.Rectangle(xPos + pedding, yPos + pedding, xPos - pedding, yPos - pedding);
+		}
+		dc.SelectObject(oldBrush);
+		brush.DeleteObject();
 	}
 }
 
