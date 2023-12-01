@@ -81,6 +81,7 @@ BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_ITEM2, &CBoardGameDlg::ClickedItem2)
 	ON_BN_CLICKED(IDB_ROLL_DICE, &CBoardGameDlg::OnBnClickedRollDice)
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_START_GAME, &CBoardGameDlg::OnBnClickedStartGame)
 END_MESSAGE_MAP()
 
 
@@ -122,7 +123,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 	MySocket.SetParent(this);			//서버 소켓
 	YourSoket.SetParent(this);			//클라이언트
 
-	//GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE); //잠시 풀어둠
+	GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE);
 	GetDlgItem(IDC_START_GAME)-> EnableWindow(FALSE);
 	srand((unsigned)time(NULL));
 	int ver = 1;
@@ -236,22 +237,34 @@ void CBoardGameDlg::OnPaint()
 					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
 				}
 			}
-
-			if (i == myPlayer->getI()) {
+			if (userType) {
 				brush.DeleteObject();
-				if (userType) {
-					brush.CreateSolidBrush(RGB(255, 200, 255));
-					oldBrush = dc.SelectObject(&brush);
-					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
-					
-				}
-				else {
+				if (i == yourPlayer->getI()) {
 					brush.CreateSolidBrush(RGB(200, 255, 255));
 					oldBrush = dc.SelectObject(&brush);
 					dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
 				}
+				if (i == myPlayer->getI()) {
+					brush.CreateSolidBrush(RGB(255, 200, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+				}
+				
 			}
+			else {
+				brush.DeleteObject();
+				if (i == myPlayer->getI()) {
+					brush.CreateSolidBrush(RGB(200, 255, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
+				}
+				if (i == yourPlayer->getI()) {
+					brush.CreateSolidBrush(RGB(255, 200, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+				}
 
+			}
 			dc.SelectObject(oldBrush);
 		}
 		brush.DeleteObject();
@@ -311,6 +324,7 @@ void CBoardGameDlg::OnAccept(){
 	MySocket.Accept(YourSoket);
 	MessageBox(_T("상대가 접속하였습니다!")); //접속 확인용 코드
 	GetDlgItem(IDC_START_GAME)->EnableWindow(TRUE);
+
 }
 
 void CBoardGameDlg::OnConnect(){
@@ -335,6 +349,7 @@ void CBoardGameDlg::OnReceive(){
 		int receivedMoveBlocks = _tstoi((const wchar_t*)pBuf);
 		
 		yourPlayer->SetI(receivedMoveBlocks);
+		GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
 		Invalidate(TRUE);
 	}
 	delete[] pBuf;
@@ -374,6 +389,7 @@ void CBoardGameDlg::ClickedItem2(){
 }
 //주사위 굴리는 함수
 void CBoardGameDlg::OnBnClickedRollDice(){
+	GetDlgItem(IDB_ROLL_DICE)->EnableWindow(FALSE);
 	SetTimer(DICE_TIMER, 50, 0);
 	myPlayer->Player_Turn = FALSE; //본인 턴 종료
 }
@@ -447,4 +463,12 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 	}
 	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CBoardGameDlg::OnBnClickedStartGame()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	GetDlgItem(IDC_START_GAME)->EnableWindow(FALSE);
+	GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
 }
