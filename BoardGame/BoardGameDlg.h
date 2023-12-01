@@ -34,4 +34,9 @@ protected:
 public:
 	CString userName;
 	CString serverAddress;
+	afx_msg void OnBnClickedCreatRoom();
+	afx_msg void OnBnClickedEnterRoom();
+	afx_msg void OnBnClickedExitGame();
+	BOOL useItem1;
+	BOOL useItem2;
 };

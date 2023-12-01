@@ -7,6 +7,7 @@
 #include "BoardGame.h"
 #include "BoardGameDlg.h"
 #include "afxdialogex.h"
+#include <math.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,6 +55,8 @@ CBoardGameDlg::CBoardGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_BOARDGAME_DIALOG, pParent)
 	, userName(_T("Guest"))
 	, serverAddress(_T("localhost"))
+	, useItem1(FALSE)
+	, useItem2(FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -63,12 +66,17 @@ void CBoardGameDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_SET_NAME, userName);
 	DDX_Text(pDX, IDC_SET_SERVER_ADDR, serverAddress);
+	DDX_Check(pDX, IDC_ITEM1, useItem1);
+	DDX_Check(pDX, IDC_ITEM2, useItem2);
 }
 
 BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_CREAT_ROOM, &CBoardGameDlg::OnBnClickedCreatRoom)
+	ON_BN_CLICKED(IDC_ENTER_ROOM, &CBoardGameDlg::OnBnClickedEnterRoom)
+	ON_BN_CLICKED(IDC_EXIT_GAME, &CBoardGameDlg::OnBnClickedExitGame)
 END_MESSAGE_MAP()
 
 
@@ -157,3 +165,25 @@ HCURSOR CBoardGameDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+//방 만들기 버튼
+void CBoardGameDlg::OnBnClickedCreatRoom()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+}
+
+//방 접속 버튼
+void CBoardGameDlg::OnBnClickedEnterRoom()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+}
+
+//게임 종료 버튼
+void CBoardGameDlg::OnBnClickedExitGame()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	OnOK();
+	//MessageBox(_T(""));
+}
