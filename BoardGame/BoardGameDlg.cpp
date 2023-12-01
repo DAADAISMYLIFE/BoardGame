@@ -139,6 +139,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 		}
 	}
 	//특수칸 만들기
+	board[0].setBlockType(2);
 	board[7].setBlockType(1);
 	board[27].setBlockType(1);
 	board[15].setBlockType(1);
@@ -343,7 +344,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 		Invalidate();
 		animationFrame++;
 
-		if (animationFrame >= 20) {
+		if (animationFrame >= 1) {
 			KillTimer(DICE_TIMER);
 			animationFrame = 0;
 
@@ -366,16 +367,28 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 					diceNum = rand() % 6 + 1;
 				}
 			}//-------------------여기까지 오면 주사위 숫자 구해짐
-			//특수칸 이벤트 처리
-
-			if (myPlayer->getI() + diceNum > BOARDSIZE - 1) {
-				myPlayer->SetI(BOARDSIZE - 1);
+			int moveBlocks = myPlayer->getI() + diceNum;
+			if (moveBlocks > BOARDSIZE - 1) {
+				moveBlocks = BOARDSIZE - 1;
+				moveBlocks = 0; //삭제
 			}
 			else {
+				//특수칸 이벤트 처리
 				//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
 				myPlayer->SetI(myPlayer->getI() + diceNum);
-				//send(diceNum);
+				if (board[moveBlocks].getBlockType() == 1) {
+					MessageBox(_T("으엑"));
+					do {
+						moveBlocks = rand() % (BOARDSIZE-1);
+					} while (board[moveBlocks].getBlockType() != 0);
+				}
+				else if (board[moveBlocks].getBlockType() == 2) {
+					MessageBox(_T("으엑"));
+					moveBlocks = 0;
+				}
 			}
+			myPlayer->SetI(moveBlocks);
+			//send(moveBlocks);
 			UpdateData(FALSE);
 			Invalidate();
 			return;
