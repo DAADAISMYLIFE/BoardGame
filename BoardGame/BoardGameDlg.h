@@ -63,4 +63,5 @@ public:
 	int animationFrame = 0;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedStartGame();
+	BOOL isConfirm = FALSE;
 };
