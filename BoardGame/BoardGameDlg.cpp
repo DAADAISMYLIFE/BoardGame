@@ -265,12 +265,23 @@ HCURSOR CBoardGameDlg::OnQueryDragIcon()
 void CBoardGameDlg::OnBnClickedCreatRoom(){
 	UpdateData(TRUE);
 	userType = TRUE;
+	//소켓 생성
+	MySocket.SetParent(this);
+	MySocket.Create(4000); //포트 생성
+	MySocket.Listen();
+	YourSoket.SetParent(this);
+	GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(FALSE);
 }
 
 //방 접속 버튼
 void CBoardGameDlg::OnBnClickedEnterRoom(){
 	UpdateData(TRUE);
 	userType = FALSE;
+	//소켓 생성
+	MySocket.SetParent(this);
+	MySocket.Create();
+	MySocket.Connect(serverAddress, 4000);
+	GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(FALSE);
 }
 
 //게임 종료 버튼
@@ -282,6 +293,9 @@ void CBoardGameDlg::OnBnClickedExitGame()
 }
 //소켓 관련 함수------------------------------------
 void CBoardGameDlg::OnAccept(){
+	MySocket.Accept(YourSoket);
+	MessageBox(_T("접속")); //접속 확인용 코드
+	GetDlgItem(IDC_START_GAME)->EnableWindow(TRUE);
 }
 
 void CBoardGameDlg::OnConnect(){
@@ -289,8 +303,14 @@ void CBoardGameDlg::OnConnect(){
 
 void CBoardGameDlg::OnClose(){
 }
-
+//데이터 받으면 실행
 void CBoardGameDlg::OnReceive(){
+	char* pBuf = new char[1025];
+	int iBufSize = 1024;
+	//Client_Socket.Receive((void*)pBuf, iBufSize);
+	myPlayer->Player_Turn = TRUE; //본인 턴 활성화
+	Invalidate(TRUE);
+	delete[] pBuf;
 }
 
 void CBoardGameDlg::OnSend(){
@@ -328,8 +348,8 @@ void CBoardGameDlg::ClickedItem2(){
 }
 //주사위 굴리는 함수
 void CBoardGameDlg::OnBnClickedRollDice(){
-	UpdateData(TRUE);
 	SetTimer(DICE_TIMER, 50, 0);
+	myPlayer->Player_Turn = FALSE; //본인 턴 종료
 }
 //상대의 주사위 넘버를 받으면 그 만큼 이동
 //diceNum = receive();
@@ -339,6 +359,7 @@ void CBoardGameDlg::OnBnClickedRollDice(){
 void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	UpdateData(TRUE);
 	if (nIDEvent == DICE_TIMER) {
 		diceNum = (rand() % 6) + 1;
 		Invalidate();

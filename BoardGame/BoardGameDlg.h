@@ -5,6 +5,7 @@
 #pragma once
 #include "Blocks.h"
 #include "Player.h"
+#include "CMySocket.h"
 #define BOARDSIZE 47
 
 
@@ -38,6 +39,7 @@ public:
 	CString userName;
 	CString serverAddress;
 	BOOL userType;
+	CMySocket MySocket, YourSoket;
 	afx_msg void OnBnClickedCreatRoom();
 	afx_msg void OnBnClickedEnterRoom();
 	afx_msg void OnBnClickedExitGame();
