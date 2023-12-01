@@ -119,6 +119,9 @@ BOOL CBoardGameDlg::OnInitDialog()
 	//플레이어 생성
 	myPlayer = new Player;
 	yourPlayer = new Player;
+	MySocket.SetParent(this);			//서버 소켓
+	YourSoket.SetParent(this);			//클라이언트
+
 	//GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE); //잠시 풀어둠
 	GetDlgItem(IDC_START_GAME)-> EnableWindow(FALSE);
 	srand((unsigned)time(NULL));
@@ -222,16 +225,31 @@ void CBoardGameDlg::OnPaint()
 
 			if (i == yourPlayer->getI()) {
 				brush.DeleteObject();
-				brush.CreateSolidBrush(RGB(200, 255, 255));
-				oldBrush = dc.SelectObject(&brush);
-				dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
+				if (userType) {
+					brush.CreateSolidBrush(RGB(200, 255, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
+				}
+				else {
+					brush.CreateSolidBrush(RGB(255, 200, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+				}
 			}
 
 			if (i == myPlayer->getI()) {
 				brush.DeleteObject();
-				brush.CreateSolidBrush(RGB(255, 200, 255));
-				oldBrush = dc.SelectObject(&brush);
-				dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+				if (userType) {
+					brush.CreateSolidBrush(RGB(255, 200, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Ellipse(xPos + 15, yPos + 15, xPos - 15, yPos - 15);
+					
+				}
+				else {
+					brush.CreateSolidBrush(RGB(200, 255, 255));
+					oldBrush = dc.SelectObject(&brush);
+					dc.Rectangle(xPos + 18, yPos + 18, xPos - 18, yPos - 18);
+				}
 			}
 
 			dc.SelectObject(oldBrush);
@@ -266,10 +284,8 @@ void CBoardGameDlg::OnBnClickedCreatRoom(){
 	UpdateData(TRUE);
 	userType = TRUE;
 	//소켓 생성
-	MySocket.SetParent(this);
-	MySocket.Create(4000); //포트 생성
+	MySocket.Create(4000);				//포트 생성
 	MySocket.Listen();
-	YourSoket.SetParent(this);
 	GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(FALSE);
 }
 
@@ -278,9 +294,8 @@ void CBoardGameDlg::OnBnClickedEnterRoom(){
 	UpdateData(TRUE);
 	userType = FALSE;
 	//소켓 생성
-	MySocket.SetParent(this);
-	MySocket.Create();
-	MySocket.Connect(serverAddress, 4000);
+	YourSoket.Create();					//포트 생성
+	YourSoket.Connect(serverAddress, 4000);
 	GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(FALSE);
 }
 
@@ -294,11 +309,12 @@ void CBoardGameDlg::OnBnClickedExitGame()
 //소켓 관련 함수------------------------------------
 void CBoardGameDlg::OnAccept(){
 	MySocket.Accept(YourSoket);
-	MessageBox(_T("접속")); //접속 확인용 코드
+	MessageBox(_T("상대가 접속하였습니다!")); //접속 확인용 코드
 	GetDlgItem(IDC_START_GAME)->EnableWindow(TRUE);
 }
 
 void CBoardGameDlg::OnConnect(){
+	MessageBox(_T("접속 성공!")); //접속 확인용 코드
 }
 
 void CBoardGameDlg::OnClose(){
@@ -307,14 +323,24 @@ void CBoardGameDlg::OnClose(){
 void CBoardGameDlg::OnReceive(){
 	char* pBuf = new char[1025];
 	int iBufSize = 1024;
-	//Client_Socket.Receive((void*)pBuf, iBufSize);
-	myPlayer->Player_Turn = TRUE; //본인 턴 활성화
-	Invalidate(TRUE);
+	int iRcvd;
+	iRcvd = YourSoket.Receive((char*)pBuf, iBufSize);
+
+	if (iRcvd == SOCKET_ERROR) {
+		MessageBox(_T("오류"));
+	}
+	else {
+		myPlayer->Player_Turn = TRUE; //본인 턴 활성화
+		pBuf[iRcvd-1] = NULL;
+		int receivedMoveBlocks = _tstoi((const wchar_t*)pBuf);
+		
+		yourPlayer->SetI(receivedMoveBlocks);
+		Invalidate(TRUE);
+	}
 	delete[] pBuf;
 }
 
-void CBoardGameDlg::OnSend(){
-}
+void CBoardGameDlg::OnSend(){}
 //--------------------------------------------------------
 void CBoardGameDlg::ClickedItem1(){
 	if (numItem1> 0) {
@@ -351,6 +377,7 @@ void CBoardGameDlg::OnBnClickedRollDice(){
 	SetTimer(DICE_TIMER, 50, 0);
 	myPlayer->Player_Turn = FALSE; //본인 턴 종료
 }
+
 //상대의 주사위 넘버를 받으면 그 만큼 이동
 //diceNum = receive();
 //myPlayer->SetI(myPlayer->getI() + diceNum);
@@ -408,8 +435,12 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 					moveBlocks = 0;
 				}
 			}
+			//int* sendLocation = &moveBlocks;
+			CString sendMoveBlocks;
+			sendMoveBlocks.Format(_T("%d"), moveBlocks);
 			myPlayer->SetI(moveBlocks);
-			//send(moveBlocks);
+			//상대방에게 나의 위치를 보낸다.
+			YourSoket.Send((LPCTSTR)sendMoveBlocks, (sendMoveBlocks.GetLength() + 1) * sizeof(TCHAR));
 			UpdateData(FALSE);
 			Invalidate();
 			return;

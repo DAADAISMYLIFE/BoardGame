@@ -38,7 +38,7 @@ protected:
 public:
 	CString userName;
 	CString serverAddress;
-	BOOL userType;
+	BOOL userType;			//true = 방장, false = 도전자
 	CMySocket MySocket, YourSoket;
 	afx_msg void OnBnClickedCreatRoom();
 	afx_msg void OnBnClickedEnterRoom();
