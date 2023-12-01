@@ -41,5 +41,17 @@ public:
 	afx_msg void OnBnClickedExitGame();
 	BOOL useItem1;
 	BOOL useItem2;
+	int numItem1 = 2;
+	int numItem2 = 2;
+	int diceNum = 0;
 	Blocks *board = new Blocks[BOARDSIZE];
+	//소켓 함수
+	void OnAccept();
+	void OnConnect();
+	void OnClose();
+	void OnReceive();
+	void OnSend();
+	afx_msg void ClickedItem1();
+	afx_msg void ClickedItem2();
+	afx_msg void OnBnClickedRollDice();
 };

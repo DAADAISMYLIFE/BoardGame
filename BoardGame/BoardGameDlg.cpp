@@ -77,6 +77,9 @@ BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CREAT_ROOM, &CBoardGameDlg::OnBnClickedCreatRoom)
 	ON_BN_CLICKED(IDC_ENTER_ROOM, &CBoardGameDlg::OnBnClickedEnterRoom)
 	ON_BN_CLICKED(IDC_EXIT_GAME, &CBoardGameDlg::OnBnClickedExitGame)
+	ON_BN_CLICKED(IDC_ITEM1, &CBoardGameDlg::ClickedItem1)
+	ON_BN_CLICKED(IDC_ITEM2, &CBoardGameDlg::ClickedItem2)
+	ON_BN_CLICKED(IDB_ROLL_DICE, &CBoardGameDlg::OnBnClickedRollDice)
 END_MESSAGE_MAP()
 
 
@@ -112,6 +115,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	srand((unsigned)time(NULL));
 	int ver = 1;
 	int hor = 1;
 	int v = 1;
@@ -205,6 +209,18 @@ void CBoardGameDlg::OnPaint()
 		}
 		dc.SelectObject(oldBrush);
 		brush.DeleteObject();
+		//주사위 그림
+		CDC MemDC;
+		MemDC.CreateCompatibleDC(&dc);
+		CBitmap diceBitMap;
+		if (diceNum != 0) {
+			diceBitMap.LoadBitmap(diceNum);
+			CBitmap* oldbitmap = MemDC.SelectObject(&diceBitMap);
+			//출력 좌표x, y, 폭, 넓이, 넣을 BITMAP DC, 저장한 것이 어디서 시작하는지 좌표
+			dc.BitBlt(700, 420, 100, 100, &MemDC, 0, 0, SRCCOPY);
+			dc.SelectObject(oldbitmap);
+			diceBitMap.DeleteObject();
+		}
 	}
 }
 
@@ -236,4 +252,75 @@ void CBoardGameDlg::OnBnClickedExitGame()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	OnOK();
 	//MessageBox(_T(""));
+}
+//소켓 관련 함수------------------------------------
+void CBoardGameDlg::OnAccept(){
+}
+
+void CBoardGameDlg::OnConnect(){
+}
+
+void CBoardGameDlg::OnClose(){
+}
+
+void CBoardGameDlg::OnReceive(){
+}
+
+void CBoardGameDlg::OnSend(){
+}
+//--------------------------------------------------------
+void CBoardGameDlg::ClickedItem1(){
+	if (numItem1> 0) {
+		if (useItem1) {
+			useItem1 = FALSE;
+		}
+		else {
+			useItem1 = TRUE;
+			useItem2 = FALSE;
+		}
+	}
+	else{
+		MessageBox(_T("아이템이 부족합니다."));
+	}
+	UpdateData(FALSE);
+}
+void CBoardGameDlg::ClickedItem2(){
+	if (numItem2 > 0) {
+		if (useItem2) {
+			useItem2 = FALSE;
+		}
+		else {
+			useItem2 = TRUE;
+			useItem1 = FALSE;
+		}
+	}
+	else {
+		MessageBox(_T("아이템이 부족합니다."));
+	}
+	UpdateData(FALSE);
+}
+//주사위 굴리는 함수
+void CBoardGameDlg::OnBnClickedRollDice(){
+	UpdateData(TRUE);
+	diceNum = rand() % 6 + 1;	//주사위 숫자
+	if (useItem1 && numItem1>0) { //홀수 아이템 사용
+		numItem1--;
+		if (numItem1 <= 0) {
+			useItem1 = FALSE;
+		}
+		while (diceNum % 2 == 0){
+			diceNum = rand() % 6 + 1;
+		}
+	}
+	else if (useItem2 && numItem2 > 0) { //짝수 아이템 사용
+		numItem2--;
+		if (numItem2 <= 0) {
+			useItem2 = FALSE;
+		}
+		while (diceNum % 2 != 0) {
+			diceNum = rand() % 6 + 1;
+		}
+	}
+	UpdateData(FALSE);
+	Invalidate();
 }
