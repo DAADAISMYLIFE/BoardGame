@@ -639,7 +639,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 			else if (board[nowLocation].getBlockType() == 4) {
-				MessageBox(_T("앗! 무인도에 갇혀버렸다!!"));
+				MessageBox(_T("앗! 감옥에 갇혀버렸다!!"));
 				isIsolated = TRUE;
 				isolatedCount = 3;
 			}
