@@ -45,8 +45,13 @@ public:
 	afx_msg void OnBnClickedExitGame();
 	BOOL useItem1;	  //홀수 아이템 사용 여부
 	BOOL useItem2;	  //짝수 아이템 사용 여부
+	BOOL useItem3;	  //3이하 아이템 사용 여부
+	BOOL useItem4;	  //4이상 아이템 사용 여부
 	int numItem1 = 2; //홀수 아이템 개수
 	int numItem2 = 2; //짝수 아이템 개수
+	int numItem3 = 1; //3이하 아이템 개수
+	int numItem4 = 1; //4이상 아이템 개수
+
 	int diceNum = 0;  //주사위 나온 숫자
 	Blocks *board = new Blocks[BOARDSIZE]; //게임판 생성
 	//소켓 함수
@@ -64,4 +69,14 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedStartGame();
 	BOOL isConfirm = FALSE;
+	int receivedLocation;
+	int moveBlocks;
+	int m_odd_count;
+	int m_even_count;
+	int m_under_count;
+	int m_over_count;
+	afx_msg void ClickedItem3();
+	afx_msg void ClickedItem4();
+	BOOL isIsolated;
+	int isolatedCount;
 };

@@ -8,6 +8,7 @@
 #define IDD_BOARDGAME_DIALOG            102
 #define DICE_TIMER                      102
 #define IDP_SOCKETS_INIT_FAILED         103
+#define DICE_YOUR_TIMER                 104
 #define IDR_MAINFRAME                   128
 #define IDB_BITMAP1                     130
 #define IDB_BITMAP2                     131
@@ -23,7 +24,14 @@
 #define IDC_ITEM2                       1005
 #define IDC_START_GAME                  1006
 #define IDC_EXIT_GAME                   1007
+#define IDC_ITEM3                       1008
 #define IDB_ROLL_DICE                   1009
+#define IDC_ITEM4                       1010
+#define IDC_EDIT_ODD                    1012
+#define IDC_EDIT_UNDER                  1013
+#define IDC_EDIT_EVEN                   1014
+#define IDC_EDIT_EVEN2                  1015
+#define IDC_EDIT_OVER                   1015
 
 // Next default values for new objects
 // 
@@ -31,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
