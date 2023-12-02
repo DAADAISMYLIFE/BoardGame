@@ -79,4 +79,5 @@ public:
 	afx_msg void ClickedItem4();
 	BOOL isIsolated;
 	int isolatedCount;
+	BOOL isGameOn;
 };

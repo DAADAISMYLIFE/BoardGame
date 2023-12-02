@@ -136,6 +136,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 	yourPlayer = new Player;
 	MySocket.SetParent(this);			//서버 소켓
 	YourSoket.SetParent(this);			//클라이언트
+	isGameOn = FALSE;
 	isIsolated = FALSE;
 	isolatedCount = 0;
 	m_even_count = numItem2;
@@ -178,7 +179,9 @@ BOOL CBoardGameDlg::OnInitDialog()
 	board[64].setBlockType(3);
 
 	board[22].setBlockType(4);
+	board[23].setBlockType(4);
 	board[36].setBlockType(4);
+	board[37].setBlockType(4);
 
 
 	UpdateData(FALSE);
@@ -337,21 +340,38 @@ HCURSOR CBoardGameDlg::OnQueryDragIcon()
 //방 만들기 버튼
 void CBoardGameDlg::OnBnClickedCreatRoom(){
 	UpdateData(TRUE);
-	userType = TRUE;
-	//소켓 생성
-	MySocket.Create(4000);				//포트 생성
-	MySocket.Listen();
-	GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(FALSE);
+	if (isGameOn) {
+		MySocket.Close();
+		GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(TRUE);
+		isGameOn = FALSE;
+	}
+	else {
+		userType = TRUE;
+		isGameOn = TRUE;
+		//소켓 생성
+		MySocket.Create(4000);				//포트 생성
+		MySocket.Listen();
+		isGameOn = TRUE;
+		GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(FALSE);
+	}
 }
 
 //방 접속 버튼
 void CBoardGameDlg::OnBnClickedEnterRoom(){
 	UpdateData(TRUE);
-	userType = FALSE;
-	//소켓 생성
-	YourSoket.Create();					//포트 생성
-	YourSoket.Connect(serverAddress, 4000);
-	GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(FALSE);
+	if (isGameOn) {
+		YourSoket.Close();
+		GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(TRUE);
+		isGameOn = FALSE;
+	}
+	else {
+		userType = FALSE;
+		isGameOn = TRUE;
+		//소켓 생성
+		YourSoket.Create();					//포트 생성
+		YourSoket.Connect(serverAddress, 4000);
+		GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(FALSE);
+	}
 }
 
 //게임 종료 버튼
