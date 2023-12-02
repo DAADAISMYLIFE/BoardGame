@@ -139,10 +139,15 @@ BOOL CBoardGameDlg::OnInitDialog()
 	isGameOn = FALSE;
 	isIsolated = FALSE;
 	isolatedCount = 0;
+	numItem1 = 2;
+	numItem2 = 2;
+	numItem3 = 1;
+	numItem4 = 1;
 	m_even_count = numItem2;
 	m_odd_count = numItem1;
 	m_under_count = numItem3;
 	m_over_count = numItem4;
+	animationFrame = 0;
 	GetDlgItem(IDB_ROLL_DICE)-> EnableWindow(FALSE);
 	GetDlgItem(IDC_START_GAME)-> EnableWindow(FALSE);
 	srand((unsigned)time(NULL));
@@ -162,7 +167,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 			ver += v;
 		}
 	}
-	//특수칸 만들기 1 = 랜덤이동, 2 = 처음이로 이동, 3 = 아이템 획득, 4 = 무인도(3턴쉼)
+	//특수칸 만들기 1 = 랜덤이동, 2 = 처음이로 이동, 3 = 아이템 획득, 4 = 무인도(3턴쉼) 5 = 골인지점
 	board[7].setBlockType(1);
 	board[18].setBlockType(1);
 	board[27].setBlockType(1);
@@ -183,6 +188,7 @@ BOOL CBoardGameDlg::OnInitDialog()
 	board[36].setBlockType(4);
 	board[37].setBlockType(4);
 
+	board[BOARDSIZE - 1].setBlockType(5);
 
 	UpdateData(FALSE);
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
@@ -241,11 +247,6 @@ void CBoardGameDlg::OnPaint()
 				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(255, 0, 0));
 			}
-			else if (i == BOARDSIZE - 1) {
-				brush.DeleteObject();
-				brush.CreateSolidBrush(RGB(0, 255, 0));
-			}
-			
 			else if (board[i].getBlockType() == 1) {
 				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(255, 255, 0));
@@ -261,6 +262,10 @@ void CBoardGameDlg::OnPaint()
 			else if (board[i].getBlockType() == 4) {
 				brush.DeleteObject();
 				brush.CreateSolidBrush(RGB(80, 80, 80));
+			}
+			else if (board[i].getBlockType() == 5) {
+				brush.DeleteObject();
+				brush.CreateSolidBrush(RGB(0, 255, 0));
 			}
 			else {
 				brush.DeleteObject();
@@ -484,6 +489,38 @@ void CBoardGameDlg::ClickedItem4()
 	UpdateData(FALSE);
 }
 
+void CBoardGameDlg::initAllSetting(){
+	delete myPlayer;
+	delete yourPlayer;
+	myPlayer = new Player;
+	yourPlayer = new Player;
+	isGameOn = FALSE;
+	isIsolated = FALSE;
+	isolatedCount = 0;
+	numItem1 = 2;
+	numItem2 = 2;
+	numItem3 = 1;
+	numItem4 = 1;
+	useItem1 = FALSE;
+	useItem2 = FALSE;
+	useItem3 = FALSE;
+	useItem4 = FALSE;
+
+	m_even_count = numItem2;
+	m_odd_count = numItem1;
+	m_under_count = numItem3;
+	m_over_count = numItem4;
+	animationFrame = 0;
+	diceNum = -1;
+	MySocket.Close();
+	YourSoket.Close();
+	GetDlgItem(IDB_ROLL_DICE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_START_GAME)->EnableWindow(FALSE);
+	GetDlgItem(IDC_CREAT_ROOM)->EnableWindow(TRUE);
+	GetDlgItem(IDC_ENTER_ROOM)->EnableWindow(TRUE);
+	UpdateData(FALSE);
+}
+
 //주사위 굴리는 함수
 void CBoardGameDlg::OnBnClickedRollDice(){
 	GetDlgItem(IDB_ROLL_DICE)->EnableWindow(FALSE);
@@ -496,7 +533,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	UpdateData(TRUE);
 	if (nIDEvent == DICE_TIMER) {
-		if(isolatedCount) {
+		if (isolatedCount) {
 			isolatedCount--;
 			CString sendLocation = _T("0");
 			sendLocation.Format(_T("%d"), myPlayer->getI());
@@ -520,7 +557,7 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				if (numItem1 <= 0) {
 					useItem1 = FALSE;
 				}
-				while (diceNum % 2 == 0){
+				while (diceNum % 2 == 0) {
 					diceNum = rand() % 6 + 1;
 				}
 			}
@@ -552,71 +589,81 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 			//-------------------여기까지 오면 주사위 숫자 구해짐
-			int moveBlocks = myPlayer->getI() + diceNum;
+			//diceNum = BOARDSIZE-1;//골인
+			//diceNum = 7;			//랜덤
+			//diceNum = 12;			//아이템
+			//diceNum = 22;			//무인도
+			//diceNum = BOARDSIZE-2;//큰일
+			diceNum = BOARDSIZE-3;//가깝게
+
+			int nowLocation = myPlayer->getI() + diceNum;
+			nowLocation = nowLocation >= BOARDSIZE - 1 ? BOARDSIZE - 1 : nowLocation;
 			CString sendLocation;
-			sendLocation.Format(_T("%d"), moveBlocks);
-			myPlayer->SetI(moveBlocks);
+			sendLocation.Format(_T("%d"), nowLocation);
+			myPlayer->SetI(nowLocation);
 			//상대방에게 나의 위치를 보낸다.
 			YourSoket.Send((LPCTSTR)sendLocation, (sendLocation.GetLength() + 1) * sizeof(TCHAR));
 
-			if (moveBlocks >= BOARDSIZE - 1) {
-				moveBlocks = BOARDSIZE - 1;
-				MessageBox(_T("내가 이김"));
+
+			//특수칸 이벤트 처리
+			//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
+			myPlayer->SetI(nowLocation);
+			if (board[nowLocation].getBlockType() == 1) {
+				MessageBox(_T("랜덤 이동!"));
+				do {
+					nowLocation = rand() % (BOARDSIZE - 7);
+				} while (board[nowLocation].getBlockType() != 0);
 			}
+			else if (board[nowLocation].getBlockType() == 2) {
+				MessageBox(_T("앗! 처음으로 이동!!"));
+				nowLocation = 0;
+			}
+			else if (board[nowLocation].getBlockType() == 3) {
+				MessageBox(_T("랜덤 아이템 획득!"));
+				int itemType = rand() % 4;
+				switch (itemType)
+				{
+				case 0:
+					numItem1++;
+					break;
+				case 1:
+					numItem2++;
+					break;
+				case 2:
+					numItem3++;
+					break;
+				case 3:
+					numItem4++;
+					break;
+				default:
+					break;
+				}
+			}
+			else if (board[nowLocation].getBlockType() == 4) {
+				MessageBox(_T("앗! 무인도에 갇혀버렸다!!"));
+				isIsolated = TRUE;
+				isolatedCount = 3;
+			}
+			sendLocation.Format(_T("%d"), nowLocation);
+			myPlayer->SetI(nowLocation);
+
+			//상대방에게 나의 위치를 보낸다.
+			YourSoket.Send((LPCTSTR)sendLocation, (sendLocation.GetLength() + 1) * sizeof(TCHAR));
+			if (board[nowLocation].getBlockType() == 5) {
+				MessageBox(_T("축하드립니다!! 승리하셨습니다 :)"));
+				initAllSetting();
+			}
+			
 			else {
-				//특수칸 이벤트 처리
-				//플레이어 이동 후 이동한 만큼 상대에게 전달할 예정
-				myPlayer->SetI(moveBlocks);
-				if (board[moveBlocks].getBlockType() == 1) {
-					MessageBox(_T("랜덤 이동!"));
-					do {
-						moveBlocks = rand() % (BOARDSIZE-7);
-					} while (board[moveBlocks].getBlockType() != 0);
-				}
-				else if (board[moveBlocks].getBlockType() == 2) {
-					MessageBox(_T("앗! 처음으로 이동!!"));
-					moveBlocks = 0;
-				}
-				else if (board[moveBlocks].getBlockType() == 3) {
-					MessageBox(_T("랜덤 아이템 획득!"));
-					int itemType = rand() % 4;
-					switch (itemType)
-					{
-					case 0:
-						numItem1++;
-						break;
-					case 1:
-						numItem2++;
-						break;
-					case 2:
-						numItem3++;
-						break;
-					case 3:
-						numItem4++;
-						break;
-					default:
-						break;
-					}
-				}
-				else if (board[moveBlocks].getBlockType() == 4) {
-					MessageBox(_T("앗! 무인도에 갇혀버렸다!!"));
-					isIsolated = TRUE;
-					isolatedCount = 3;
-				}
+				m_odd_count = numItem1;
+				m_even_count = numItem2;
+				m_under_count = numItem3;
+				m_over_count = numItem4;
+				useItem1 = FALSE;
+				useItem2 = FALSE;
+				useItem3 = FALSE;
+				useItem4 = FALSE;
 			}
-			sendLocation.Format(_T("%d"), moveBlocks);
-			myPlayer->SetI(moveBlocks);
-
-			//상대방에게 나의 위치를 보낸다.
-			YourSoket.Send((LPCTSTR)sendLocation, (sendLocation.GetLength() + 1) * sizeof(TCHAR));
-			m_odd_count = numItem1;
-			m_even_count = numItem2;
-			m_under_count = numItem3;
-			m_over_count = numItem4;
-			useItem1 = FALSE;
-			useItem2 = FALSE;
-			useItem3 = FALSE;
-			useItem4 = FALSE;
 			UpdateData(FALSE);
 			Invalidate();
 		}
@@ -625,7 +672,6 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 		if (board[yourPlayer->getI()].getBlockType() != 0) {
 			animationFrame = 20;
 		}
-
 		if (animationFrame >= 20) {
 			KillTimer(DICE_YOUR_TIMER);
 			animationFrame = 0;
@@ -633,8 +679,13 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 			moveBlocks = receivedLocation - yourPlayer->getI();
 			diceNum = moveBlocks;
 			yourPlayer->SetI(receivedLocation);
-			if (board[yourPlayer->getI()].getBlockType() == 0 || board[yourPlayer->getI()].getBlockType() == 3 || board[yourPlayer->getI()].getBlockType() == 4) {
+			if (board[yourPlayer->getI()].getBlockType() != 1 && board[yourPlayer->getI()].getBlockType() != 2){
 				GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
+			}
+			if (board[yourPlayer->getI()].getBlockType() == 5) {
+				Invalidate();
+				MessageBox(_T("이런... 상대방이 먼저 도착하였습니다 :("));
+				initAllSetting();
 			}
 			UpdateData(FALSE);
 			Invalidate();
@@ -644,8 +695,6 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 			Invalidate();
 			animationFrame++;
 		}
-
-
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }

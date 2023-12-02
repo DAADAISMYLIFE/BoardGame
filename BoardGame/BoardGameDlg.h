@@ -47,10 +47,10 @@ public:
 	BOOL useItem2;	  //짝수 아이템 사용 여부
 	BOOL useItem3;	  //3이하 아이템 사용 여부
 	BOOL useItem4;	  //4이상 아이템 사용 여부
-	int numItem1 = 2; //홀수 아이템 개수
-	int numItem2 = 2; //짝수 아이템 개수
-	int numItem3 = 1; //3이하 아이템 개수
-	int numItem4 = 1; //4이상 아이템 개수
+	int numItem1; //홀수 아이템 개수
+	int numItem2; //짝수 아이템 개수
+	int numItem3; //3이하 아이템 개수
+	int numItem4; //4이상 아이템 개수
 
 	int diceNum = 0;  //주사위 나온 숫자
 	Blocks *board = new Blocks[BOARDSIZE]; //게임판 생성
@@ -65,7 +65,7 @@ public:
 	afx_msg void OnBnClickedRollDice();
 	Player *myPlayer;
 	Player *yourPlayer;
-	int animationFrame = 0;
+	int animationFrame;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedStartGame();
 	BOOL isConfirm = FALSE;
@@ -80,4 +80,5 @@ public:
 	BOOL isIsolated;
 	int isolatedCount;
 	BOOL isGameOn;
+	void initAllSetting();
 };
