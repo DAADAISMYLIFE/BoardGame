@@ -6,6 +6,7 @@
 #include "Blocks.h"
 #include "Player.h"
 #include "CMySocket.h"
+#include "ManualDialog.h"
 #define BOARDSIZE 71
 
 
@@ -77,8 +78,10 @@ public:
 	int m_over_count;
 	afx_msg void ClickedItem3();
 	afx_msg void ClickedItem4();
+	afx_msg void OnBnClickedManual();
 	BOOL isIsolated;
 	int isolatedCount;
 	BOOL isGameOn;
 	void initAllSetting();
+	ManualDialog* Manual;
 };

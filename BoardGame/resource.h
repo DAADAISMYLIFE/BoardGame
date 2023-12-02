@@ -16,6 +16,7 @@
 #define IDB_BITMAP4                     133
 #define IDB_BITMAP5                     134
 #define IDB_BITMAP6                     135
+#define IDD_MANUAL_DLG                  136
 #define IDC_SET_NAME                    1000
 #define IDC_SET_SERVER_ADDR             1001
 #define IDC_CREAT_ROOM                  1002
@@ -32,14 +33,15 @@
 #define IDC_EDIT_EVEN                   1014
 #define IDC_EDIT_EVEN2                  1015
 #define IDC_EDIT_OVER                   1015
+#define IDC_MANUAL                      1016
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
+#define _APS_NEXT_RESOURCE_VALUE        138
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

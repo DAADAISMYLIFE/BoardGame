@@ -96,6 +96,7 @@ BEGIN_MESSAGE_MAP(CBoardGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_START_GAME, &CBoardGameDlg::OnBnClickedStartGame)
 	ON_BN_CLICKED(IDC_ITEM3, &CBoardGameDlg::ClickedItem3)
 	ON_BN_CLICKED(IDC_ITEM4, &CBoardGameDlg::ClickedItem4)
+	ON_BN_CLICKED(IDC_MANUAL, &CBoardGameDlg::OnBnClickedManual)
 END_MESSAGE_MAP()
 
 
@@ -318,8 +319,6 @@ void CBoardGameDlg::OnPaint()
 			dc.SelectObject(oldBrush);
 		}
 		brush.DeleteObject();
-		 
-		// //////////
 		//주사위 그림
 		CDC MemDC;
 		MemDC.CreateCompatibleDC(&dc);
@@ -328,7 +327,7 @@ void CBoardGameDlg::OnPaint()
 			diceBitMap.LoadBitmap(diceNum);
 			CBitmap* oldbitmap = MemDC.SelectObject(&diceBitMap);
 			//출력 좌표x, y, 폭, 넓이, 넣을 BITMAP DC, 저장한 것이 어디서 시작하는지 좌표
-			dc.BitBlt(750, 400, 100, 100, &MemDC, 0, 0, SRCCOPY);
+			dc.BitBlt(750, 405, 100, 100, &MemDC, 0, 0, SRCCOPY);
 			dc.SelectObject(oldbitmap);
 			diceBitMap.DeleteObject();
 		}
@@ -706,4 +705,10 @@ void CBoardGameDlg::OnBnClickedStartGame()
 	GetDlgItem(IDC_START_GAME)->EnableWindow(FALSE);
 	GetDlgItem(IDB_ROLL_DICE)->EnableWindow(TRUE);
 
+}
+//설명서 버튼
+void CBoardGameDlg::OnBnClickedManual(){
+	Manual = new ManualDialog;
+	Manual->Create(IDD_MANUAL_DLG);
+	Manual->ShowWindow(SW_SHOW);
 }
