@@ -399,6 +399,7 @@ void CBoardGameDlg::OnConnect(){
 }
 
 void CBoardGameDlg::OnClose(){
+	MessageBox(_T("상대방이 게임을 나갔습니다. "));
 }
 //데이터 받으면 실행
 void CBoardGameDlg::OnReceive(){
@@ -588,12 +589,13 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 				}
 			}
 			//-------------------여기까지 오면 주사위 숫자 구해짐
+			//밑에 코드는 테스트용
 			//diceNum = BOARDSIZE-1;//골인
 			//diceNum = 7;			//랜덤
 			//diceNum = 12;			//아이템
 			//diceNum = 22;			//무인도
 			//diceNum = BOARDSIZE-2;//큰일
-			diceNum = BOARDSIZE-3;//가깝게
+			//diceNum = BOARDSIZE-3;//가깝게
 
 			int nowLocation = myPlayer->getI() + diceNum;
 			nowLocation = nowLocation >= BOARDSIZE - 1 ? BOARDSIZE - 1 : nowLocation;
