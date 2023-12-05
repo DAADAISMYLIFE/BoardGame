@@ -551,43 +551,39 @@ void CBoardGameDlg::OnTimer(UINT_PTR nIDEvent)
 			KillTimer(DICE_TIMER);
 			animationFrame = 0;
 
-			diceNum = rand() % 6 + 1;	//주사위 숫자
-			if (useItem1) { //홀수 아이템 사용
+
+			bool hz = true;
+			bool tf = true;
+			do {
+				diceNum = rand() % 6 + 1;	//주사위 숫자
+				
+				if (useItem1) {	//홀
+					hz = diceNum % 2 != 0;
+				}
+				if (useItem2) {
+					hz = diceNum % 2 == 0;
+				}
+				if (useItem3) {
+					tf = diceNum <= 3;
+				}
+				if (useItem4) {
+					tf = diceNum >= 4;
+				}
+			} while (!(hz && tf));
+
+			if (useItem1) {	//홀
 				numItem1--;
-				if (numItem1 <= 0) {
-					useItem1 = FALSE;
-				}
-				while (diceNum % 2 == 0) {
-					diceNum = rand() % 6 + 1;
-				}
 			}
-			if (useItem2) { //짝수 아이템 사용
+			if (useItem2) {
 				numItem2--;
-				if (numItem2 <= 0) {
-					useItem2 = FALSE;
-				}
-				while (diceNum % 2 != 0) {
-					diceNum = rand() % 6 + 1;
-				}
 			}
-			if (useItem3) { //3이하 아이템 사용
+			if (useItem3) {
 				numItem3--;
-				if (numItem3 <= 0) {
-					useItem3 = FALSE;
-				}
-				while (diceNum >= 3) {
-					diceNum = rand() % 6 + 1;
-				}
 			}
-			if (useItem4) { //4이상 아이템 사용
+			if (useItem4) {
 				numItem4--;
-				if (numItem4 <= 0) {
-					useItem4 = FALSE;
-				}
-				while (diceNum <= 4) {
-					diceNum = rand() % 6 + 1;
-				}
 			}
+
 			//-------------------여기까지 오면 주사위 숫자 구해짐
 			//밑에 코드는 테스트용
 			//diceNum = BOARDSIZE-1;//골인
